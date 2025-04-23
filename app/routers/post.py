@@ -58,8 +58,8 @@ def create_post(post: schemas.PostCreate, db: Session = Depends(get_db), current
     
     #new_post = models.Post(title=post.title, content=post.content, published = post.published)
     ### **post.dict() - menja ovaj kod iznad odnosno sam uzima vrednosti koje prosledjuje korisnik!!!!!!!!!!!
-    print(current_user.id)
-    new_post = models.Post(owner_id = current_user.id, **post.dict())
+    print(current_user.id_user)
+    new_post = models.Post(owner_id = current_user.id_user, **post.dict())
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
@@ -83,7 +83,7 @@ def update_post(id:int, updated_post:schemas.PostCreate, db: Session = Depends(g
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail=f"post with id: {id} dose not exist")
     
-    if post.owner_id != current_user.id:
+    if post.owner_id != current_user.id_user:
          raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
                             detail="Not Authorized to perform requested action")
 
@@ -108,7 +108,7 @@ def delete_post(id: int, db: Session = Depends(get_db), current_user: int = Depe
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail=f"post with id: {id} dose not exist")
 
-    if post.owner_id != current_user.id:
+    if post.owner_id != current_user.id_user:
          raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
                             detail="Not Authorized to perform requested action")
 

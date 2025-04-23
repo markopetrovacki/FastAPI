@@ -12,10 +12,11 @@ class PostCreate(PostBase):
     pass
 
 
+
 class UserOut(BaseModel):
-    id: int
+    id_user: int
     email: EmailStr
-    created_at: datetime
+    datum_kreiranja_naloga: datetime
 
     class Config:
         orm_model = True
@@ -41,19 +42,6 @@ class PostOut(BaseModel):
     class Config:
         orm_model = True
 
-
-
-class UserCreate(BaseModel):
-    email: EmailStr
-    password: str
-
-
-
-
-
-class UserLogin(BaseModel):
-    email: EmailStr
-    password: str
 
 
 class Token(BaseModel):
