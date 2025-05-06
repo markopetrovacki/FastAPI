@@ -41,16 +41,24 @@ class StavkaRoba(BaseModel):
     id_robe_fk: int
     barcod: str
     naziv: str
+    cena_robe: int
+    stopa_PDV: int 
+    cena_robe_sa_PDV_om: int
     kolicina: int
     ukupna_cena_robe: int
+   
 
 
 class StavkaUsluga(BaseModel):
     id_usluge_fk: int
     sifra: str
     opis: str
+    cena_usluge: int
+    stopa_PDV: int
+    cena_usluge_sa_PDV_om: int
     kolicina: int
     ukupna_cena_usluge: int
+    
 
 
 

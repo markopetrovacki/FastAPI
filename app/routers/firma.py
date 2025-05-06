@@ -75,9 +75,9 @@ def update_firma(id:int, updated_firma:firma_schemas.CreateFirma, db: Session = 
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail=f"firma sa id-jem: {id} nije pronadjena")
     
-   # if firma.id_user_fk != current_user.id_user:
-   #      raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
-   #                         detail="Not Authorized to perform requested action")
+    #if firma.id_user_fk != current_user.id_user:
+    #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
+    #                        detail="Not Authorized to perform requested action")
 
     firma_query.update(updated_firma.dict(), synchronize_session=False)
     db.commit() 
@@ -87,7 +87,7 @@ def update_firma(id:int, updated_firma:firma_schemas.CreateFirma, db: Session = 
 
 
 @router.delete("/firma/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_firma(id: int, db: Session = Depends(get_db)):
+def delete_firma(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
 
     firma_query = db.query(models.Firma).filter(models.Firma.id_firme == id)
 
@@ -97,9 +97,9 @@ def delete_firma(id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail=f"post with id: {id} dose not exist")
 
-  #  if post.owner_id != current_user.id_user:
-  #       raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
-  #                          detail="Not Authorized to perform requested action")
+    #if firma.id_user_fk != current_user.id_user:
+    #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
+    #                        detail="Not Authorized to perform requested action")
 
 
   # ovoj deo brise sve entitete u tabeli userFirma is ID-jem firme koja se brise
@@ -113,7 +113,7 @@ def delete_firma(id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/firma/user", status_code=status.HTTP_201_CREATED)
-def dodaj_korisnika_u_firmu(payload: firma_schemas.UserFirmaCreate, db: Session = Depends(get_db)):
+def dodaj_korisnika_u_firmu(payload: firma_schemas.UserFirmaCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     # Pronađi korisnika po imenu, prezimenu i emailu
     korisnik = db.query(models.User).filter(
         models.User.ime_korisnika == payload.ime,
@@ -132,6 +132,15 @@ def dodaj_korisnika_u_firmu(payload: firma_schemas.UserFirmaCreate, db: Session 
 
     if not firma:
         raise HTTPException(status_code=404, detail="Firma nije pronađena")
+
+    veza = db.query(models.UserFirma).filter(
+        models.UserFirma.id_user_fk == current_user.id_user,
+        models.UserFirma.id_firme_fk == firma.id_firme
+    ).first()
+
+    if not veza:
+        raise HTTPException(status_code=403, detail="Nemate dozvolu da dodajete korisnike u ovu firmu")
+
 
     # Proveri da li su već povezani
    # if korisnik in firma.korisnici:

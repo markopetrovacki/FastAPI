@@ -41,8 +41,13 @@ async def get_racun_id(id: int, db: Session = Depends(get_db)):
             "id_usluge_fk": usluga.id_usluge,
             "sifra": usluga.sifra,
             "opis": usluga.opis,
+            "cena_usluge": usluga.cena_usluge,
+            "stopa_PDV": usluga.stopa_PDV,
+            "cena_usluge_sa_PDV_om": (usluga.cena_usluge * (usluga.stopa_PDV * 0.01 +1)),
             "kolicina": usluga_racun.kolicina,
             "ukupna_cena_usluge": usluga_racun.ukupna_cena_usluge
+            
+            
         })
 
     usluge_robe = ( 
@@ -57,9 +62,14 @@ async def get_racun_id(id: int, db: Session = Depends(get_db)):
         stavke_roba.append({
             "id_robe_fk": roba.id_robe,
             "barcod": roba.barcod,
-            "naziv": roba.naziv,
+            "naziv": roba.naziv,           
+            "cena_robe": roba.cena_robe,
+            "stopa_PDV": roba.stopa_PDV,
+            "cena_robe_sa_PDV_om": (roba.cena_robe * (roba.stopa_PDV * 0.01 + 1)),
             "kolicina": roba_racun.kolicina,
-            "ukupna_cena_robe": roba_racun.ukupna_cena_robe,
+            "ukupna_cena_robe": roba_racun.ukupna_cena_robe
+            
+            
         })
 
 
@@ -108,28 +118,31 @@ def create_racun(racun: racun_schemas.CreateRacun, db: Session = Depends(get_db)
 
     for stavka in racun.stavke_usluga:
 
-        cena_usluge = db.query(models.Usluga.cena_usluge).filter(models.Usluga.id_usluge == stavka.id_usluge_fk).scalar()
+        #cena_usluge = db.query(models.Usluga.cena_usluge).filter(models.Usluga.id_usluge == stavka.id_usluge_fk).scalar()
+        usluga = db.query(models.Usluga).filter(models.Usluga.id_usluge == stavka.id_usluge_fk).first()
 
         db.add(models.UslugaRacun(
             id_racuna_fk=novi_racun.id_racuna,
             id_usluge_fk=stavka.id_usluge_fk,
             kolicina=stavka.kolicina,
-            ukupna_cena_usluge= stavka.kolicina * cena_usluge
+            ukupna_cena_usluge= stavka.kolicina * usluga.cena_usluge * (usluga.stopa_PDV * 0.01 + 1)
         ))
-        ukupna_cena_racuna = ukupna_cena_racuna + (stavka.kolicina * cena_usluge)
+        ukupna_cena_racuna = ukupna_cena_racuna + (stavka.kolicina * usluga.cena_usluge * (usluga.stopa_PDV * 0.01 +1))
+        #ovo je cena sa PDV-om koji je unet samo ga nisam ispisao na racunu to bi verovatno trebalo
 
 
     for stavka in racun.stavke_roba:
         
-        cena_robe = db.query(models.Roba.cena_robe).filter(models.Roba.id_robe == stavka.id_robe_fk).scalar()
+        #cena_robe = db.query(models.Roba.cena_robe).filter(models.Roba.id_robe == stavka.id_robe_fk).scalar()
+        roba = db.query(models.Roba).filter(models.Roba.id_robe == stavka.id_robe_fk).first()
 
         db.add(models.RobaRacun(
             id_racuna_fk=novi_racun.id_racuna,
             id_robe_fk=stavka.id_robe_fk,
             kolicina=stavka.kolicina,
-            ukupna_cena_robe=stavka.kolicina * cena_robe
+            ukupna_cena_robe=stavka.kolicina * roba.cena_robe * (roba.stopa_PDV * 0.01 + 1)
         ))
-        ukupna_cena_racuna = ukupna_cena_racuna + (stavka.kolicina * cena_robe)
+        ukupna_cena_racuna = ukupna_cena_racuna + (stavka.kolicina * roba.cena_robe * (roba.stopa_PDV * 0.01 + 1))
 
     userRacun = models.UserRacun(
         datum_kreiranja_racuna=datetime.utcnow(),
@@ -174,29 +187,31 @@ def update_racun(id: int, racun: racun_schemas.CreateRacun, db: Session = Depend
     # DODAJ NOVE STAVKE USLUGA
     for stavka in racun.stavke_usluga:
         
-        cena_usluge = db.query(models.Usluga.cena_usluge).filter(models.Usluga.id_usluge == stavka.id_usluge_fk).scalar()
-
+        #cena_usluge = db.query(models.Usluga.cena_usluge).filter(models.Usluga.id_usluge == stavka.id_usluge_fk).scalar()
+        usluga = db.query(models.Usluga).filter(models.Usluga.id_usluge == stavka.id_usluge_fk).first()
+        
         db.add(models.UslugaRacun(
             id_racuna_fk=id,
             id_usluge_fk=stavka.id_usluge_fk,
             kolicina=stavka.kolicina,
-            ukupna_cena_usluge=stavka.kolicina * cena_usluge
+            ukupna_cena_usluge= stavka.kolicina * usluga.cena_usluge * (usluga.stopa_PDV * 0.01 + 1)
         ))
-        ukupna_cena_racuna = ukupna_cena_racuna + (stavka.kolicina * cena_usluge)
+        ukupna_cena_racuna = ukupna_cena_racuna + (stavka.kolicina * usluga.cena_usluge * (usluga.stopa_PDV * 0.01 +1))
     
 
     # DODAJ NOVE STAVKE ROBA
     for stavka in racun.stavke_roba:
 
-        cena_robe = db.query(models.Roba.cena_robe).filter(models.Roba.id_robe == stavka.id_robe_fk).scalar()
-
+        #cena_robe = db.query(models.Roba.cena_robe).filter(models.Roba.id_robe == stavka.id_robe_fk).scalar()
+        roba = db.query(models.Roba).filter(models.Roba.id_robe == stavka.id_robe_fk).first()
+       
         db.add(models.RobaRacun(
             id_racuna_fk=id,
             id_robe_fk=stavka.id_robe_fk,
             kolicina=stavka.kolicina,
-            ukupna_cena_robe=stavka.kolicina * cena_robe
+            ukupna_cena_robe=stavka.kolicina * roba.cena_robe * (roba.stopa_PDV * 0.01 + 1)
         ))
-        ukupna_cena_racuna = ukupna_cena_racuna + (stavka.kolicina * cena_robe)
+        ukupna_cena_racuna = ukupna_cena_racuna + (stavka.kolicina * roba.cena_robe * (roba.stopa_PDV * 0.01 + 1))
 
 
     # Ažuriraj i datum izmene u userRacun tabeli
