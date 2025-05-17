@@ -451,7 +451,7 @@ def create_racun_predracun(racun: racun_schemas.CreateRacunPredracun, db: Sessio
 
         id_firme_fk = predracun.id_firme_fk,
         id_kupac_fk = predracun.id_kupac_fk,
-        id_predracuna = predracun.id_predracuna,
+        id_predracuna = racun.id_predracuna,
         id_korisnik_kreirao_fk = current_user.id_user
     )
     db.add(novi_racun)

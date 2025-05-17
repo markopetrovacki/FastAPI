@@ -50,8 +50,8 @@ class StavkaRoba(BaseModel):
     barcod: str
     naziv: str
     cena_robe: int
-    stopa_PDVa: int | None
-    cena_robe_sa_PDV_om: int | None
+    stopa_PDVa: int
+    cena_robe_sa_PDV_om: int 
     kolicina: int
     ukupna_cena_robe: int
    
@@ -62,8 +62,8 @@ class StavkaUsluga(BaseModel):
     sifra: str
     opis: str
     cena_usluge: int
-    stopa_PDVa: int | None
-    cena_usluge_sa_PDV_om: int | None
+    stopa_PDVa: int 
+    cena_usluge_sa_PDV_om: int 
     kolicina: int
     ukupna_cena_usluge: int
     
