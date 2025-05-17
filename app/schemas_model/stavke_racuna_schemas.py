@@ -11,7 +11,7 @@ class GetRobaRacun(BaseModel):
     kolicina: int
     osnovica_pdv_robe: int 
     stopa_PDVa: int 
-    iznos_pdv_robe: int
+    iznos_pdv_robe: float
     ukupna_cena_robe: int
     #datum_kreiranja: datetime
     id_robe_fk: int
@@ -23,7 +23,7 @@ class GetUslugaRacun(BaseModel):
     kolicina: int
     osnovica_pdv_usluge: int
     stopa_PDVa: int
-    iznos_pdv_usluge: int 
+    iznos_pdv_usluge: float
     ukupna_cena_usluge: int
     datum_kreiranja: datetime
     id_usluge_fk: int
@@ -51,7 +51,7 @@ class StavkaRoba(BaseModel):
     naziv: str
     cena_robe: int
     stopa_PDVa: int
-    cena_robe_sa_PDV_om: int 
+    cena_robe_sa_PDV_om: float 
     kolicina: int
     ukupna_cena_robe: int
    
@@ -63,7 +63,7 @@ class StavkaUsluga(BaseModel):
     opis: str
     cena_usluge: int
     stopa_PDVa: int 
-    cena_usluge_sa_PDV_om: int 
+    cena_usluge_sa_PDV_om: float
     kolicina: int
     ukupna_cena_usluge: int
     
