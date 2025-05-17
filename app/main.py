@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from . import models
 from .database import engine
-from .routers import post, user, auth, vote, firma, roba, usluga, racun, kupac
+from .routers import post, user, auth, vote, firma, roba, usluga, racun, kupac, predracun, avans, otpremnica
 from .config import settings
 
 
@@ -42,6 +42,9 @@ app.include_router(firma.router)
 app.include_router(kupac.router)
 app.include_router(roba.router)
 app.include_router(usluga.router)
+app.include_router(predracun.router)
+app.include_router(avans.router)
+app.include_router(otpremnica.router)
 app.include_router(racun.router)
 
 

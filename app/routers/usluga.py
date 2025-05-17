@@ -35,9 +35,13 @@ async def get_usluga_id(id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/usluga", status_code=status.HTTP_201_CREATED, response_model = usluga_schemas.GetUsluga)
-async def create_usluga(usluga: usluga_schemas.GetUsluga, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+async def create_usluga(usluga: usluga_schemas.CreateUsluga, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
 
-    new_usluga = models.Usluga(**usluga.dict())
+    new_usluga = models.Usluga(
+        **usluga.dict(),
+        iznos_pdv_usluge = usluga.cena_usluge * usluga.stopa_PDVa * 0.01,
+        iznos_usluge_sa_pdv = usluga.cena_usluge * (usluga.stopa_PDVa * 0.01 + 1)
+        )
     
     db.add(new_usluga)
     db.commit()
@@ -48,7 +52,7 @@ async def create_usluga(usluga: usluga_schemas.GetUsluga, db: Session = Depends(
 
 
 @router.put("/usluga/{id}", response_model = usluga_schemas.GetUsluga)
-def update_usluga(id:int, updated_usluga: usluga_schemas.GetUsluga, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+def update_usluga(id:int, updated_usluga: usluga_schemas.CreateUsluga, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
 
     usluga_query = db.query(models.Usluga).filter(models.Usluga.id_usluge == id)
     usluga = usluga_query.first()
@@ -61,7 +65,12 @@ def update_usluga(id:int, updated_usluga: usluga_schemas.GetUsluga, db: Session 
    #      raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
    #                         detail="Not Authorized to perform requested action")
 
-    usluga_query.update(updated_usluga.dict(), synchronize_session=False)
+    usluga_query.update(
+        updated_usluga.dict(), 
+        iznos_pdv_usluge = usluga.cena_usluge * usluga.stopa_PDVa * 0.01,
+        iznos_usluge_sa_pdv = usluga.cena_usluge * (usluga.stopa_PDVa * 0.01 + 1),
+        synchronize_session=False
+        )
     db.commit() 
 
     return usluga_query.first()
@@ -87,4 +96,16 @@ def delete_usluga(id: int, db: Session = Depends(get_db)):
     db.commit()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get("/usluga/firma/{id_firme}", response_model = List[usluga_schemas.GetUsluga])
+async def get_usluga_firma(id_firme: int, db: Session = Depends(get_db)):
+
+    usluge = db.query(models.Usluga).filter(models.Usluga.id_firme_fk == id_firme).all()
+
+    if not usluge:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                            detail= f"Usluga sa id-jem firme: {id_firme} nije pronadjena")
+    
+    return usluge
 

@@ -5,6 +5,7 @@ from . import user_schemas
 
 
 class GetFirma(BaseModel):
+    id_firme: int
     sifra: str
     naziv: str
     mesto: str
@@ -13,6 +14,7 @@ class GetFirma(BaseModel):
     maticni_broj: int 
 
 class GetFirmaId(BaseModel):
+    id_firme: int
     sifra: str
     naziv: str
     mesto: str

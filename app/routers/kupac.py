@@ -35,7 +35,7 @@ async def get_kupac_id(id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/kupac", status_code=status.HTTP_201_CREATED, response_model = kupac_schemas.GetKupac)
-async def create_kupac(kupac:  kupac_schemas.GetKupac, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+async def create_kupac(kupac:  kupac_schemas.CreateKupac, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
 
     new_kupac = models.Kupac(**kupac.dict())
     
