@@ -32,7 +32,13 @@ async def get_racun_id(id: int, db: Session = Depends(get_db)):
 
     racun = db.query(models.Racun).filter(models.Racun.id_racuna == id).first()
    # uslugeRacun = db.query(models.UslugaRacun).filter(models.UslugaRacun.id_racun_fk == id).all()
-
+    
+    if racun.tip_izdatog_racuna != "Racun":
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Racun nije pronađen."
+        )
+    
     if not racun:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail= f"firma sa id-jem: {id} nije pronadjena")

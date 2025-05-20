@@ -13,7 +13,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[],
+    allow_origins=["http://localhost:3000"],
    # allow_origins=["https://mojfrontend.netlify.app"],  # ili ["*"] za   mozes da dodas i dva servisa npr google i youtube
    #OVO JE KADA NAMESTIS FRONTEND DA DODAS NJEGOVU PUDANJU DA BI MOGLI NESMETANO DA SALJU API ZAHTEVE INACE BEZ TOGA NE BI MOGLI
    # OVO NEMA VEZE SA CLOUDOM DA NA ISTOM CLOUDU MOGU DA LOMUNICIRAJU VEĆ SA NJIHOVIM URL-om NA KOJEM SE POKRECU 
